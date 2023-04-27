@@ -53,7 +53,7 @@ public class Auth {
 
                 req.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
                 req.sendResponseHeaders(200, 0);
-                req.getResponseBody().write("loggin in... you can close this page".getBytes(StandardCharsets.UTF_8));
+                req.getResponseBody().write("loggin in... you can close this page.  If you do not get logged in, check the logger for errors.".getBytes(StandardCharsets.UTF_8));
             } catch (Exception e) {
                 log.warn("failure serving oauth response", e);
                 req.sendResponseHeaders(400, 0);
@@ -79,6 +79,7 @@ public class Auth {
             try (var response = new OkHttpClient().newCall(request).execute()) {
                 if (!response.isSuccessful()) {
                     log.warn("failed to login: " + response.code() + " " + response.body().string());
+                    SwingUtilities.invokeLater(() -> jLabel.setText("Failed to login: " + response.code()));
                     return;
                 }
 
