@@ -49,7 +49,6 @@ public class Auth {
                 var url = HttpUrl.get("http://localhost" + req.getRequestURI());
                 code = url.queryParameter("code");
 
-                System.out.println("GOT CODE:" + code);
                 req.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
                 req.sendResponseHeaders(200, 0);
                 req.getResponseBody().write("loggin in... you can close this page".getBytes(StandardCharsets.UTF_8));
@@ -77,7 +76,7 @@ public class Auth {
 
             try (var response = new OkHttpClient().newCall(request).execute()) {
                 if (!response.isSuccessful()) {
-                    System.out.println("failed to login: " + response.code() + " " + response.body().string());
+                    log.warn("failed to login: " + response.code() + " " + response.body().string());
                     return;
                 }
 
@@ -87,7 +86,6 @@ public class Auth {
             }
         });
 
-        System.out.println("starting server " + server);
         server.start();
 
         LinkBrowser.browse("https://discord.com/api/oauth2/authorize?client_id=1100474876298543114&redirect_uri=http%3A%2F%2Flocalhost%3A63518&response_type=code&scope=identify");
