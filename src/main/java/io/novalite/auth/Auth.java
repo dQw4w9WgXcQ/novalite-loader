@@ -29,7 +29,7 @@ public class Auth {
     public static final int PORT = 63518;
     public static final int BACKUP_PORT = 57252;
 
-    public static final boolean DEV = true;
+    public static final boolean DEV = false;
     public static final String URL = DEV ? "http://localhost:8080" : "https://novalite.up.railway.app";
     public static final HttpUrl API_BASE = HttpUrl.get(URL);
     public static final File SESSION_FILE = new File(RuneLite.RUNELITE_DIR, "session");
