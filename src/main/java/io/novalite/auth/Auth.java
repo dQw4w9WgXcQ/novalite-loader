@@ -41,6 +41,8 @@ public class Auth {
 
     @SneakyThrows
     public void login() {
+        SESSION_FILE.delete();
+
         var server = HttpServer.create(new InetSocketAddress("localhost", PORT), 1);
         server.createContext("/", req ->
         {
