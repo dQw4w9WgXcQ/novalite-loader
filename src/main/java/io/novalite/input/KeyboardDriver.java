@@ -2,16 +2,18 @@ package io.novalite.input;
 
 import io.novalite.commons.Keyboard;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.awt.event.KeyEvent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@Slf4j
 public class KeyboardDriver implements Keyboard {
     private int threadCount = 0;
     private final ExecutorService exe = Executors.newCachedThreadPool(task -> {
-        System.out.println("new keyboard thread " + threadCount);
+        log.debug("new keyboard thread " + threadCount);
         return new Thread(task, "keyboard-" + threadCount++);
     });
     private final FocusDriver focusDriver;
@@ -53,7 +55,7 @@ public class KeyboardDriver implements Keyboard {
 
         return exe.submit(() -> {
             focusDriver.require();
-            System.out.println("charCode: " + charCode + " modifiers: " + modifiers + " charCode.toChar: " + (char) charCode + " exKeyCode: " + exKeyCode + " exKeyCode.toChar: " + (char) exKeyCode + " exKeyCode lowercase: " + Character.toLowerCase((char) exKeyCode));
+            log.debug("charCode: " + charCode + " modifiers: " + modifiers + " charCode.toChar: " + (char) charCode + " exKeyCode: " + exKeyCode + " exKeyCode.toChar: " + (char) exKeyCode + " exKeyCode lowercase: " + Character.toLowerCase((char) exKeyCode));
             canvasInput.keyPressed(exKeyCode, modifiers);
             sleep(1, 3);
             canvasInput.keyTyped((char) charCode);
@@ -72,7 +74,7 @@ public class KeyboardDriver implements Keyboard {
     }
 
     public Future<?> type(char c) {
-        System.out.println("char: " + c + " code " + (int) c);
+        log.debug("char: " + c + " code " + (int) c);
         return typeKey(c, 0);
     }
 

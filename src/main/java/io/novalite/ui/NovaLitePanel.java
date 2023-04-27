@@ -4,7 +4,7 @@ import io.novalite.NovaLite;
 import io.novalite.auth.Auth;
 import io.novalite.commons.IBotScript;
 import io.novalite.commons.ScriptMeta;
-import io.novalite.script.ScriptManager;
+import io.novalite.script.LocalScriptManager;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.ui.PluginPanel;
@@ -19,7 +19,7 @@ public class NovaLitePanel extends PluginPanel {
 
 	private final JFrame logFrame;
 	private final TrimmingJTextArea logTextArea;
-	private final ScriptManager scriptManager;
+	private final LocalScriptManager localScriptManager;
 	private final Auth auth;
 
 	public NovaLitePanel() {
@@ -31,7 +31,7 @@ public class NovaLitePanel extends PluginPanel {
 		System.setOut(new PrintStreamInterceptor(System.out, logTextArea, false));
 		System.setErr(new PrintStreamInterceptor(System.err, logTextArea, true));
 
-		this.scriptManager = new ScriptManager();
+		this.localScriptManager = new LocalScriptManager();
 
 		this.auth = new Auth();
 
@@ -47,7 +47,7 @@ public class NovaLitePanel extends PluginPanel {
 		startButton.addActionListener(e -> {
 			ScriptListEntry entry = scriptList.getSelectedValue();
 			if (entry != null) {
-				scriptManager.startScript(entry.getScriptClass());
+				localScriptManager.startScript(entry.getScriptClass());
 			}
 		});
 		northPanel.add(startButton);
@@ -55,7 +55,7 @@ public class NovaLitePanel extends PluginPanel {
 		//stopButton
 		JButton stopButton = new JButton("Stop");
 		stopButton.addActionListener(e -> {
-			scriptManager.stopScript();
+			localScriptManager.stopScript();
 			refreshScriptList();
 		});
 		northPanel.add(stopButton);
@@ -64,11 +64,6 @@ public class NovaLitePanel extends PluginPanel {
 		JButton logButton = new JButton("Logger");
 		logButton.addActionListener(e -> openLogger());
 		northPanel.add(logButton);
-
-		//loginButton
-		JButton loginButton = new JButton("Login");
-		loginButton.addActionListener(e -> auth.login());
-		northPanel.add(loginButton);
 
 		//paint
 //		JButton drawMouseButton = new JButton("Paint");
@@ -91,8 +86,13 @@ public class NovaLitePanel extends PluginPanel {
 		Panel southPanel = new Panel(new GridLayout(0, 1));
 
 		JLabel accountJLabel = new JLabel();
-		auth.setJlabel(accountJLabel);
+		auth.init(accountJLabel);
 		southPanel.add(accountJLabel);
+
+		//loginButton
+		JButton loginButton = new JButton("Login");
+		loginButton.addActionListener(e -> auth.login());
+		southPanel.add(loginButton);
 
 		add(southPanel, BorderLayout.SOUTH);
 
@@ -110,7 +110,7 @@ public class NovaLitePanel extends PluginPanel {
 
 	private void refreshScriptList() {
 		Vector<ScriptListEntry> scriptListEntries = new Vector<>();
-		for (Class<? extends IBotScript> scriptClass : scriptManager.loadScripts()) {
+		for (Class<? extends IBotScript> scriptClass : localScriptManager.loadScripts()) {
 			scriptListEntries.add(new ScriptListEntry(scriptClass));
 		}
 

@@ -97,7 +97,7 @@ public class InteractDriver implements Interact {
         }
 
         if (widget != null) {
-            System.out.println(Arrays.toString(client.getMenuEntries()));
+            log.debug(Arrays.toString(client.getMenuEntries()));
             MenuEntry menuEntry = Arrays.stream(client.getMenuEntries())
                     .filter(it -> actionMatches.test(it.getOption()))
                     .findFirst()
@@ -148,7 +148,7 @@ public class InteractDriver implements Interact {
 
     private void setWidget(Widget widget, Predicate<String> actionMatches) {
         if (widget != null) {
-            System.out.println("setting widget " + widget.getId());
+            log.debug("setting widget " + widget.getId());
         }
 
         this.widget = widget;

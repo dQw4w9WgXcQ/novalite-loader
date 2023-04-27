@@ -1,6 +1,5 @@
 package io.novalite;
 
-import com.allatori.annotations.DoNotRename;
 import io.novalite.commons.ApiContext;
 import io.novalite.commons.ApiExtensions;
 import io.novalite.commons.Definitions;
@@ -21,19 +20,15 @@ import javax.inject.Inject;
 
 @NoArgsConstructor
 public class NovaLite {
-    @DoNotRename
     @Inject
     private Client client;
 
-    @DoNotRename
     @Inject
     private ClientThread clientThread;
 
-    @DoNotRename
     @Inject
     private EventBus eventBus;
 
-    @DoNotRename
     @SuppressWarnings("UnstableApiUsage")
     public static void init() {
         NovaLite novaLite = RuneLite.getInjector().getInstance(NovaLite.class);

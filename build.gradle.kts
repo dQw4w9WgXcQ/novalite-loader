@@ -19,7 +19,7 @@ dependencies {
     compileOnly("io.novalite:novalite-commons:1.9.15.2a")
     compileOnly("net.runelite:client:1.9.15.2")
     compileOnly("org.projectlombok:lombok:1.18.20")
-    compileOnly(group = "org.jetbrains", name = "annotations", version = "23.1.0")//version in kotlin-stdlib is 13.0
+    compileOnly("org.jetbrains:annotations:23.1.0")//version in kotlin-stdlib 1.8.21 is 13.0
     annotationProcessor("org.projectlombok:lombok:1.18.20")
 }
 
@@ -27,8 +27,8 @@ apply<MavenPublishPlugin>()
 
 tasks {
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 

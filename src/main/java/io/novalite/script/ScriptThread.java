@@ -30,12 +30,9 @@ class ScriptThread extends Thread {
                 script.run();
             } catch (Exception e) {
                 log.warn("exception in script run", e);
-            } catch (VirtualMachineError vme) {
-                //actual bad error
+            } catch (VirtualMachineError vme) {//actual bad error
                 throw vme;
-            }
-            //just catch all errors bc kotlin t0do error etc.
-            catch (Error e) {
+            } catch (Error e) {//just catch all errors bc kotlin t0do error etc.
                 log.warn("error in script run", e);
             }
 

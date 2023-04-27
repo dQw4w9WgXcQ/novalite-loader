@@ -20,13 +20,13 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class ScriptManager {
+public class LocalScriptManager {
 	private final File SCRIPTS_DIR = new File(RuneLite.RUNELITE_DIR, "scripts");
 
 	@Getter
 	private final ScriptThread scriptThread = new ScriptThread();
 
-	public ScriptManager() {
+	public LocalScriptManager() {
 		scriptThread.start();
 		SCRIPTS_DIR.mkdirs();
 	}
