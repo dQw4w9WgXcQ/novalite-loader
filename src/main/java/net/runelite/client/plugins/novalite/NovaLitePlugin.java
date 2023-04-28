@@ -14,25 +14,25 @@ import java.awt.image.BufferedImage;
 
 @DoNotRename
 @PluginDescriptor(
-		name = "NovaLite",
-		loadWhenOutdated = true,
-		hidden = true
+        name = "NovaLite",
+        loadWhenOutdated = true,
+        hidden = true
 )
 @Slf4j
 public class NovaLitePlugin extends Plugin {
-	@Inject
-	private ClientToolbar clientToolbar;
+    @Inject
+    private ClientToolbar clientToolbar;
 
-	@Override
-	protected void startUp() {
-		NovaLitePanel panel = new NovaLitePanel();
-		final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "novalite_icon.png");
-		NavigationButton navButton = NavigationButton.builder()
-				.tooltip("NovaLite")
-				.icon(icon)
-				.priority(Integer.MIN_VALUE)
-				.panel(panel)
-				.build();
-		clientToolbar.addNavigation(navButton);
-	}
+    @Override
+    protected void startUp() {
+        NovaLitePanel panel = new NovaLitePanel();
+        final BufferedImage icon = ImageUtil.loadImageResource(getClass(), "novalite_icon.png");
+        NavigationButton navButton = NavigationButton.builder()
+                .tooltip("NovaLite")
+                .icon(icon)
+                .priority(Integer.MIN_VALUE)
+                .panel(panel)
+                .build();
+        clientToolbar.addNavigation(navButton);
+    }
 }

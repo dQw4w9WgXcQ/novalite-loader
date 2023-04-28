@@ -1,7 +1,7 @@
 package io.novalite;
 
 import io.novalite.commons.Interact;
-import io.novalite.input.MouseDriver;
+import io.novalite.commons.exception.RetryException;
 import io.novalite.reflection.ObfuscationMapping;
 import io.novalite.reflection.ReflDef;
 import io.novalite.reflection.Reflection;
@@ -25,13 +25,11 @@ public class InteractDriver implements Interact {
     private final ClientThread clientThread;
     private final Client client;
     private final Reflection reflection;
-    private final MouseDriver mouse;
 
-    public InteractDriver(ClientThread clientThread, Client client, Reflection reflection, MouseDriver mouse, EventBus eventBus) {
+    public InteractDriver(ClientThread clientThread, Client client, Reflection reflection, EventBus eventBus) {
         this.clientThread = clientThread;
         this.client = client;
         this.reflection = reflection;
-        this.mouse = mouse;
         eventBus.register(this);
     }
 
@@ -71,7 +69,7 @@ public class InteractDriver implements Interact {
 
             ClientThreadUtil.invoke(clientThread, () -> {
                 if (baseX != client.getBaseX() || baseY != client.getBaseY()) {
-                    throw new RuntimeException("Base position changed");//todo better exception
+                    throw new RetryException("Base position changed");
                 }
 
                 setWalkFields(x, y);

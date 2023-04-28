@@ -42,7 +42,7 @@ public class NovaLite {
 
         NovaLiteConfig novaLiteConfig = new NovaLiteConfig();
         ApiExtensions apiExtensions = new ApiExtensionsDriver(reflection);
-        Interact interact = new InteractDriver(novaLite.clientThread, novaLite.client, reflection, mouse, novaLite.eventBus);
+        Interact interact = new InteractDriver(novaLite.clientThread, novaLite.client, reflection, novaLite.eventBus);
         Definitions definitions = new DefinitionCache(novaLite.client, novaLite.clientThread, novaLite.eventBus);
 
         ApiContext.init(

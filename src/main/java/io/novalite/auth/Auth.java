@@ -71,7 +71,7 @@ public class Auth {
                         .addPathSegment("discord")
                         .build();
 
-                var stringMap = Map.of("code", Objects.requireNonNull(code), "port", PORT);
+                Map<String, ?> stringMap = Map.of("code", Objects.requireNonNull(code), "port", PORT);
                 RequestBody body = RequestBody.create(JSON, new Gson().toJson(stringMap));
 
                 Request request = new Request.Builder()
