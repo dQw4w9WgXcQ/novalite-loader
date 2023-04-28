@@ -10,13 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.Point;
-import net.runelite.api.events.MenuEntryAdded;
-import net.runelite.api.events.MenuOptionClicked;
+import net.runelite.api.events.PostClientTick;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -58,7 +58,6 @@ public class InteractDriver implements Interact {
     @Override
     public void interactWidget(Widget widget, Predicate<String> actionMatches) {
         ClientThreadUtil.invoke(clientThread, () -> setWidget(widget, actionMatches));
-        mouse.click();
     }
 
     @Override
@@ -81,49 +80,36 @@ public class InteractDriver implements Interact {
     }
 
     @Subscribe
-    public void onMenuEntryAdded(MenuEntryAdded e) {
+    public void onPostClientTick(PostClientTick e) {
+        MenuEntry menuEntry = null;
         if (identifier != -1) {
-            MenuEntry menuEntry = Arrays.stream(client.getMenuEntries())
+            menuEntry = Arrays.stream(client.getMenuEntries())
                     .filter(it -> it.getIdentifier() == identifier && actionMatches.test(it.getOption()))
                     .findFirst()
                     .orElse(null);
 
-            if (menuEntry == null) {
-                return;
+            if (menuEntry != null) {
+                resetTargetTag();
+                actionMatches = null;
+                identifier = -1;
             }
-
-            client.setMenuEntries(new MenuEntry[]{menuEntry});
-            return;
-        }
-
-        if (widget != null) {
+        } else if (widget != null) {
             log.debug(Arrays.toString(client.getMenuEntries()));
-            MenuEntry menuEntry = Arrays.stream(client.getMenuEntries())
+            menuEntry = Arrays.stream(client.getMenuEntries())
                     .filter(it -> actionMatches.test(it.getOption()))
                     .findFirst()
                     .orElse(null);
 
-            if (menuEntry == null) {
-                return;
+            if (menuEntry != null) {
+                resetWidget();
+                actionMatches = null;
+                widget = null;
             }
-
-            client.setMenuEntries(new MenuEntry[]{menuEntry});
-            return;
-        }
-    }
-
-    @Subscribe
-    public void onMenuOptionClicked(MenuOptionClicked e) {
-        if (identifier != -1) {
-            identifier = -1;
-            resetTargetTag();
         }
 
-        if (widget != null) {
-            resetWidget();
+        if (menuEntry != null) {
+            doAction(menuEntry);
         }
-
-        actionMatches = null;
     }
 
     private int identifier = -1;
@@ -133,7 +119,6 @@ public class InteractDriver implements Interact {
     @SneakyThrows
     private void interactEntity(long tag, int identifier, Predicate<String> actionMatches) {
         ClientThreadUtil.invoke(clientThread, () -> setTargetTag(tag, identifier, actionMatches));
-        mouse.click();
     }
 
     private void setTargetTag(long tag, int identifier, Predicate<String> actionMatches) {
@@ -147,10 +132,6 @@ public class InteractDriver implements Interact {
     }
 
     private void setWidget(Widget widget, Predicate<String> actionMatches) {
-        if (widget != null) {
-            log.debug("setting widget " + widget.getId());
-        }
-
         this.widget = widget;
         this.actionMatches = actionMatches;
         reflection.setField(new ReflDef("rl10", "widget", null), null, widget);
@@ -160,14 +141,66 @@ public class InteractDriver implements Interact {
         setWidget(null, null);
     }
 
-    private final ReflDef sceneSelectedX = ObfuscationMapping.SCENE_SELECTED_X.getDef();
-    private final ReflDef sceneSelectedY = ObfuscationMapping.SCENE_SELECTED_Y.getDef();
-    private final ReflDef viewportWalking = ObfuscationMapping.VIEWPORT_WALKING.getDef();
-
     private void setWalkFields(int x, int y) {
-        reflection.setField(sceneSelectedX, null, x);
-        reflection.setField(sceneSelectedY, null, y);
-        reflection.setField(viewportWalking, null, true);
+        reflection.setField(ObfuscationMapping.SCENE_SELECTED_X.getDef(), null, x);
+        reflection.setField(ObfuscationMapping.SCENE_SELECTED_Y.getDef(), null, y);
+        reflection.setField(ObfuscationMapping.VIEWPORT_WALKING.getDef(), null, true);
+    }
+
+    private void doAction(MenuEntry menuEntry) {
+        log.debug("doaction: + " + menuEntry);
+        Point mouseCanvasPosition = client.getMouseCanvasPosition();
+        doAction(
+                menuEntry.getParam0(),
+                menuEntry.getParam1(),
+                menuEntry.getType().getId(),
+                menuEntry.getIdentifier(),
+                menuEntry.getItemId(),
+                menuEntry.getOption(),
+                menuEntry.getTarget(),
+                mouseCanvasPosition.getX(),
+                mouseCanvasPosition.getY()
+        );
+    }
+
+    @SneakyThrows
+    private void doAction(int param0, int param1, int opcode, int identifier, int itemId, String action, String target, int x, int y) {
+        log.debug("doaction: " +
+                "param0: " + param0 +
+                " param1: " + param1 +
+                " opcode: " + opcode +
+                " identifier: " + identifier +
+                " itemId: " + itemId +
+                " action: " + action +
+                " target: " + target +
+                " x: " + x +
+                " y: " + y);
+        ReflDef def = ObfuscationMapping.MENU_ACTION.getDef();
+        Method method = Class.forName(def.getClassName(), false, reflection.getRlClassLoader()).getDeclaredMethod(
+                def.getFieldName(),
+                int.class,
+                int.class,
+                int.class,
+                int.class,
+                int.class,
+                String.class,
+                String.class,
+                int.class,
+                int.class,
+                int.class//garbage
+        );
+        @SuppressWarnings("deprecation") boolean access = method.isAccessible();
+        if (!access) {
+            method.setAccessible(true);
+        }
+
+        try {
+            method.invoke(null, param0, param1, opcode, identifier, itemId, action, target, x, y, 1875049190);
+        } finally {
+            if (!access) {
+                method.setAccessible(false);
+            }
+        }
     }
 
     private long calculateTag(int arg1, int arg2, int type, boolean uninteractable, int identifier) {

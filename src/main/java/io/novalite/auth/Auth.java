@@ -11,6 +11,7 @@ import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.Response;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -49,7 +50,7 @@ public class Auth {
             {
                 String code = null;
                 try {
-                    var url = HttpUrl.get("http://localhost" + req.getRequestURI());
+                    HttpUrl url = HttpUrl.get("http://localhost" + req.getRequestURI());
                     code = url.queryParameter("code");
 
                     req.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
@@ -65,20 +66,20 @@ public class Auth {
                     server = null;
                 }
 
-                var url = API_BASE.newBuilder()
+                HttpUrl url = API_BASE.newBuilder()
                         .addPathSegment("auth")
                         .addPathSegment("discord")
                         .build();
 
                 var stringMap = Map.of("code", Objects.requireNonNull(code), "port", PORT);
-                var body = RequestBody.create(JSON, new Gson().toJson(stringMap));
+                RequestBody body = RequestBody.create(JSON, new Gson().toJson(stringMap));
 
-                var request = new Request.Builder()
+                Request request = new Request.Builder()
                         .url(url)
                         .post(body)
                         .build();
 
-                try (var response = new OkHttpClient().newCall(request).execute()) {
+                try (Response response = new OkHttpClient().newCall(request).execute()) {
                     if (!response.isSuccessful()) {
                         log.warn("failed to login: " + response.code() + " " + response.body().string());
                         SwingUtilities.invokeLater(() -> jLabel.setText("Failed to login: " + response.code()));
@@ -86,7 +87,7 @@ public class Auth {
                     }
 
                     SESSION_FILE.delete();
-                    var map = new Gson().fromJson(response.body().string(), Map.class);
+                    Map map = new Gson().fromJson(response.body().string(), Map.class);
                     session = (String) map.get("session");
                     sessionCheck();
                 }
@@ -101,32 +102,32 @@ public class Auth {
     public void sessionCheck() throws IOException {
         if (session == null) throw new IllegalStateException("session null");
 
-        var url = API_BASE.newBuilder()
+        HttpUrl url = API_BASE.newBuilder()
                 .addPathSegment("auth")
                 .addPathSegment("check")
                 .build();
 
-        var request = new Request.Builder()
+        Request request = new Request.Builder()
                 .header("Authorization", "Bearer " + session)
                 .url(url)
                 .build();
 
-        try (var response = new OkHttpClient().newCall(request).execute()) {
+        try (Response response = new OkHttpClient().newCall(request).execute()) {
             if (response.code() == 403) {
                 jLabel.setText("Session expired.  Please sign in again");
                 SESSION_FILE.delete();
                 this.session = null;
             } else if (response.isSuccessful()) {
-                var map = new Gson().fromJson(response.body().string(), Map.class);
-                var username = (String) map.get("username");
+                Map map = new Gson().fromJson(response.body().string(), Map.class);
+                String username = (String) map.get("username");
                 log.info("Session valid for: {}", username);
                 jLabel.setText("Logged in as " + username);
                 if (!SESSION_FILE.exists()) {
                     SESSION_FILE.createNewFile();
                     //write the session to file
-                    var hostname = InetAddress.getLocalHost().getHostName();
-                    var encrypted = Crypt.encrypt(hostname + session);
-                    try (var out = new FileOutputStream(SESSION_FILE)) {
+                    String hostname = InetAddress.getLocalHost().getHostName();
+                    byte[] encrypted = Crypto.encrypt(hostname + session);
+                    try (FileOutputStream out = new FileOutputStream(SESSION_FILE)) {
                         out.write(encrypted);
                     }
                 }
@@ -161,7 +162,7 @@ public class Auth {
         }
 
         byte[] bytes;
-        try (var in = new FileInputStream(SESSION_FILE)) {
+        try (FileInputStream in = new FileInputStream(SESSION_FILE)) {
             bytes = in.readAllBytes();
         } catch (Exception e) {
             log.warn("Unable to load session file", e);
@@ -170,20 +171,20 @@ public class Auth {
 
         String decrypted;
         try {
-            decrypted = Crypt.decrypt(bytes);
+            decrypted = Crypto.decrypt(bytes);
         } catch (Exception e) {
             log.warn("Unable to read session file", e);
             throw e;
         }
 
-        var hostname = InetAddress.getLocalHost().getHostName();
+        String hostname = InetAddress.getLocalHost().getHostName();
         if (!decrypted.startsWith(hostname)) {
             log.warn("Unable to read session file.");
             SESSION_FILE.delete();
             return null;
         }
 
-        var session = decrypted.substring(hostname.length());
+        String session = decrypted.substring(hostname.length());
         log.debug("Loaded session file");
         return session;
     }

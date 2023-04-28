@@ -6,7 +6,6 @@ import io.novalite.reflection.ReflDef;
 import io.novalite.reflection.Reflection;
 import lombok.RequiredArgsConstructor;
 import net.runelite.api.Actor;
-import net.runelite.api.widgets.Widget;
 import org.jetbrains.annotations.Nullable;
 
 @RequiredArgsConstructor
@@ -21,7 +20,7 @@ public class ApiExtensionsDriver implements ApiExtensions {
     }
 
     @Override
-    public @Nullable Widget @Nullable [] widgetGroup(int id) {
+    public @Nullable Object @Nullable [] widgetGroup(int id) {
         return reflection.getField(widgetInterfaceComponents, null);
     }
 }

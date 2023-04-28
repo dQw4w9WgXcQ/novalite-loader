@@ -6,7 +6,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 
-public class Crypt {
+public class Crypto {
     @SneakyThrows
     public static byte[] encrypt(String text) {
         String secret = "y/B?E(H+MbQeThWm";

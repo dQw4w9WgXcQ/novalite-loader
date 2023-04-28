@@ -9,7 +9,8 @@ public enum ObfuscationMapping {
     SCENE_SELECTED_X(new ReflDef("ie", "bd", 1)),
     SCENE_SELECTED_Y(new ReflDef("ie", "bt", 1)),
     VIEWPORT_WALKING(new ReflDef("ie", "bj", null)),
-    WIDGET_INTERFACE_COMPONENTS(new ReflDef("hn", "ap", null));
+    WIDGET_INTERFACE_COMPONENTS(new ReflDef("hn", "ap", null)),
+    MENU_ACTION(new ReflDef("ar", "ke", null));//1875049190
 
     @Getter
     private final ReflDef def;

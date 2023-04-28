@@ -1,5 +1,6 @@
 package io.novalite.reflection;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.jetbrains.annotations.Nullable;
@@ -8,6 +9,7 @@ import java.lang.reflect.Field;
 
 @RequiredArgsConstructor
 public class Reflection {
+    @Getter
     private final ClassLoader rlClassLoader;
 
     @SneakyThrows
