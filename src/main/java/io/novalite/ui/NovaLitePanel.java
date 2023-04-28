@@ -60,10 +60,10 @@ public class NovaLitePanel extends PluginPanel {
 		});
 		northPanel.add(stopButton);
 
-		//logButton
-		JButton logButton = new JButton("Logger");
-		logButton.addActionListener(e -> openLogger());
-		northPanel.add(logButton);
+		//loginButton
+		JButton loginButton = new JButton("Login");
+		loginButton.addActionListener(e -> auth.login());
+		northPanel.add(loginButton);
 
 		//paint
 //		JButton drawMouseButton = new JButton("Paint");
@@ -89,10 +89,10 @@ public class NovaLitePanel extends PluginPanel {
 		auth.init(accountJLabel);
 		southPanel.add(accountJLabel);
 
-		//loginButton
-		JButton loginButton = new JButton("Login");
-		loginButton.addActionListener(e -> auth.login());
-		southPanel.add(loginButton);
+		//logButton
+		JButton logButton = new JButton("Logger");
+		logButton.addActionListener(e -> openLogger());
+		southPanel.add(logButton);
 
 		add(southPanel, BorderLayout.SOUTH);
 

@@ -82,23 +82,6 @@ public class KeyboardDriver implements Keyboard {
         return typeKey(KeyEvent.VK_ENTER, 0);
     }
 
-    public Future<?> space() {
-        return typeKey(KeyEvent.VK_SPACE, 0);
-    }
-
-    public Future<?> esc() {
-        return typeKey(KeyEvent.VK_ESCAPE, 0);
-    }
-
-    public Future<?> backspace(int reps) {
-        if (reps < 1) {
-            throw new IllegalArgumentException();
-        }
-
-        throw new RuntimeException("todo");//todo
-//		return type(String.valueOf((char) KeyEvent.VK_BACK_SPACE).repeat(reps), false);
-    }
-
     @SneakyThrows
     public static void sleep(int min, int max) {
         Thread.sleep(min + (int) (Math.random() * (max - min)));

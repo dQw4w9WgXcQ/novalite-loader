@@ -73,7 +73,7 @@ public class LocalScriptManager {
 			log.info("no script running");
 		} else {
 			log.info("asking script {} to stop", activeScript.getClass().getSimpleName());
-			activeScript.stopLooping();
+			activeScript.stop();
 		}
 	}
 
