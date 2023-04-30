@@ -23,4 +23,9 @@ public class ApiExtensionsDriver implements ApiExtensions {
     public @Nullable Object @Nullable [] widgetGroup(int id) {
         return reflection.getField(widgetInterfaceComponents, null);
     }
+
+    @Override
+    public boolean isWorldSelectorOpen() {
+        throw new RuntimeException("TODO: not implemented");//todo
+    }
 }
