@@ -45,6 +45,8 @@ public class NovaLitePlugin extends Plugin {
 
     @DoNotRename
     public static void init() {
+        var folder = Paths.get(System.getProperty("user.home"), "NovaLite", "cache").toFile();
+        folder.mkdirs();
         Path path = Paths.get(System.getProperty("user.home"), "NovaLite", "cache", "patched.cache");
 
         if (Files.exists(path)) {

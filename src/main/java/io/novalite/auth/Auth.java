@@ -6,12 +6,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import net.runelite.client.util.LinkBrowser;
-import okhttp3.HttpUrl;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -113,8 +108,12 @@ public class Auth {
                 .build();
 
         try (Response response = new OkHttpClient().newCall(request).execute()) {
-            if (response.code() == 403) {
+            if (response.code() == 404) {
                 jLabel.setText("Session expired.  Please sign in again");
+                SESSION_FILE.delete();
+                this.session = null;
+            } else if (response.code() == 403) {
+                jLabel.setText("Session expired.  Please sign in again.");
                 SESSION_FILE.delete();
                 this.session = null;
             } else if (response.isSuccessful()) {

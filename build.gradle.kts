@@ -2,8 +2,9 @@ plugins {
     id("java")
 }
 
+val rlVersion = "1.9.15.3"
 group = "io.novalite"
-version = "1.9.15.2a"
+version = rlVersion + "a"
 
 repositories {
     mavenCentral()
@@ -16,8 +17,8 @@ repositories {
 
 dependencies {
     implementation(files("libs/allatori-annotations.jar"))
-    compileOnly("io.novalite:novalite-commons:1.9.15.2a")
-    compileOnly("net.runelite:client:1.9.15.2")
+    compileOnly("io.novalite:novalite-commons:0.0.0")
+    compileOnly("net.runelite:client:$rlVersion")
     compileOnly("org.projectlombok:lombok:1.18.20")
     compileOnly("org.jetbrains:annotations:23.1.0")//version in kotlin-stdlib 1.8.21 is 13.0
     annotationProcessor("org.projectlombok:lombok:1.18.20")
