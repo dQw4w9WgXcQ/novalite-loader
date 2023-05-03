@@ -156,8 +156,8 @@ public class InteractDriver implements Interact {
                 menuEntry.getItemId(),
                 menuEntry.getOption(),
                 menuEntry.getTarget(),
-                mouseCanvasPosition.getX(),
-                mouseCanvasPosition.getY()
+                -100,
+                -100
         );
     }
 

@@ -17,10 +17,11 @@ repositories {
 
 dependencies {
     implementation(files("libs/allatori-annotations.jar"))
-    compileOnly("io.novalite:novalite-commons:0.0.0")
+    compileOnly("io.novalite:novalite-commons:$version")
     compileOnly("net.runelite:client:$rlVersion")
     compileOnly("org.projectlombok:lombok:1.18.20")
-    compileOnly("org.jetbrains:annotations:23.1.0")//version in kotlin-stdlib 1.8.21 is 13.0
+    compileOnly("org.jetbrains:annotations:23.1.0")
+    runtimeOnly("org.jetbrains.kotlin:kotlin-stdlib:1.8.21")
     annotationProcessor("org.projectlombok:lombok:1.18.20")
 }
 
