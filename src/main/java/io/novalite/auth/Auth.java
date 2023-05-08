@@ -2,13 +2,19 @@ package io.novalite.auth;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpServer;
+import io.novalite.NovaLite;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.RuneLite;
 import net.runelite.client.util.LinkBrowser;
-import okhttp3.*;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 import org.jetbrains.annotations.Nullable;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,12 +31,7 @@ public class Auth {
     public static final int PORT = 34085;
     public static final int BACKUP_PORT = 57252;
 
-    public static final boolean DEV = false;
-    public static final String URL = DEV ? "http://localhost:8080" : "https://novalite.up.railway.app";
-    public static final HttpUrl API_BASE = HttpUrl.get(URL);
     public static final File SESSION_FILE = new File(RuneLite.RUNELITE_DIR, "session2");
-
-    public static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     private JLabel jLabel = null;
     private volatile String session = null;
@@ -61,13 +62,13 @@ public class Auth {
                     server = null;
                 }
 
-                var url = API_BASE.newBuilder()
+                var url = NovaLite.API_BASE.newBuilder()
                         .addPathSegment("auth")
                         .addPathSegment("discord")
                         .build();
 
                 Map<String, ?> stringMap = Map.of("code", Objects.requireNonNull(code), "port", PORT);
-                var body = RequestBody.create(JSON, new Gson().toJson(stringMap));
+                var body = RequestBody.create(NovaLite.JSON, new Gson().toJson(stringMap));
 
                 var request = new Request.Builder()
                         .url(url)
@@ -97,7 +98,7 @@ public class Auth {
     public void sessionCheck() throws IOException {
         if (session == null) throw new IllegalStateException("session null");
 
-        var url = API_BASE.newBuilder()
+        var url = NovaLite.API_BASE.newBuilder()
                 .addPathSegment("auth")
                 .addPathSegment("check")
                 .build();
@@ -125,7 +126,7 @@ public class Auth {
                     SESSION_FILE.createNewFile();
                     //write the session to file
                     var hostname = InetAddress.getLocalHost().getHostName();
-                    var encrypted = Crypto.encrypt(hostname + session);
+                    var encrypted = encrypt(hostname + session);
                     try (var out = new FileOutputStream(SESSION_FILE)) {
                         out.write(encrypted);
                     }
@@ -170,7 +171,7 @@ public class Auth {
 
         String decrypted;
         try {
-            decrypted = Crypto.decrypt(bytes);
+            decrypted = decrypt(bytes);
         } catch (Exception e) {
             log.warn("Unable to read session file", e);
             throw e;
@@ -186,5 +187,22 @@ public class Auth {
         var session = decrypted.substring(hostname.length());
         log.debug("Loaded session file");
         return session;
+    }
+
+    @SneakyThrows
+    public static byte[] encrypt(String text) {
+        var key = new SecretKeySpec("y/B?E(H+MbQeThWm".getBytes(), "AES");
+        var cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(text.getBytes());
+    }
+
+    @SneakyThrows
+    public static String decrypt(byte[] encrypted) {
+        var key = new SecretKeySpec("y/B?E(H+MbQeThWm".getBytes(), "AES");
+        var cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        var decrypted = cipher.doFinal(encrypted);
+        return new String(decrypted);
     }
 }

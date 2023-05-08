@@ -15,6 +15,10 @@ public class ApiExtensionsDriver implements ApiExtensions {
     private final ReflDef actorPathLength = ObfuscationMapping.ACTOR_PATH_LENGTH.getDef();
     private final ReflDef widgetInterfaceComponents = ObfuscationMapping.WIDGET_INTERFACE_COMPONENTS.getDef();
 
+    public void setDisableInput(boolean disableInput) {
+        reflection.setField(new ReflDef("rl10", "disableInput", null), null, disableInput);
+    }
+
     @Override
     public int actorPathLength(Actor actor) {
         return reflection.getField(actorPathLength, actor);

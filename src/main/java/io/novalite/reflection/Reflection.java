@@ -33,7 +33,7 @@ public class Reflection {
     @SneakyThrows
     public void setField(ReflDef def, @Nullable Object instance, Object value) {
         Field field = Class.forName(def.getClassName(), false, rlClassLoader).getDeclaredField(def.getFieldName());
-        @SuppressWarnings("deprecation") boolean access = field.isAccessible();
+        boolean access = field.canAccess(instance);
         if (!access) {
             field.setAccessible(true);
         }

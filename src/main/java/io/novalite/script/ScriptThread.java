@@ -1,5 +1,6 @@
 package io.novalite.script;
 
+import io.novalite.ApiExtensionsDriver;
 import io.novalite.commons.IBotScript;
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -10,8 +11,11 @@ class ScriptThread extends Thread {
     @Getter
     private volatile IBotScript script;
 
-    public ScriptThread() {
+    private final ApiExtensionsDriver apiExtensionsDriver;
+
+    public ScriptThread(ApiExtensionsDriver apiExtensionsDriver) {
         super("script");
+        this.apiExtensionsDriver = apiExtensionsDriver;
     }
 
     @SneakyThrows
@@ -26,6 +30,8 @@ class ScriptThread extends Thread {
                 }
             }
 
+            apiExtensionsDriver.setDisableInput(true);
+
             try {
                 script.run();
             } catch (Exception e) {
@@ -36,6 +42,7 @@ class ScriptThread extends Thread {
                 log.warn("error in script run", e);
             }
 
+            apiExtensionsDriver.setDisableInput(false);
             script = null;
         }
     }

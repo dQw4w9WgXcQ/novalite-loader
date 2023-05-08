@@ -31,7 +31,7 @@ public class NovaLitePanel extends PluginPanel {
         System.setOut(new PrintStreamInterceptor(System.out, logTextArea, false));
         System.setErr(new PrintStreamInterceptor(System.err, logTextArea, true));
 
-        this.localScriptManager = new LocalScriptManager();
+        this.localScriptManager = new LocalScriptManager(NovaLite.getApiExtensions());
 
         this.auth = new Auth();
 
